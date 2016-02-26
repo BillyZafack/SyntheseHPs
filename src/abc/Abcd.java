@@ -5,8 +5,7 @@
  */
 package abc;
 
-import java.awt.Color;
-import java.awt.Paint;
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,20 +13,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
+
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,7 +35,9 @@ import org.apache.poi.xssf.usermodel.XSSFPicture;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jfree.data.category.DefaultCategoryDataset; 
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartUtilities;
@@ -67,6 +59,7 @@ public class Abcd {
     public String fichier_synthese;
     public String annee;
     public static final int NB_USINE = 6;
+    public static int num_sheets = 1;
     
     
     
@@ -103,7 +96,7 @@ public class Abcd {
       //Iterate over data and write to sheet
       Set < String > keyid = empinfo.keySet();
       int rowid = 0;
-      for (String key : keyid)
+      for (String key : keyid) //__
       {
          row = spreadsheet.createRow(rowid++);
          Object [] objectArr = empinfo.get(key);
@@ -166,6 +159,7 @@ public class Abcd {
       fis.close();
       return test;
     }
+
     public void writeFormatALLSheet(ArrayList<Map < String, Object[] >> empinfo, String name) throws FileNotFoundException, IOException{
          //Create blank workbook
       XSSFWorkbook workbook = null;
@@ -262,8 +256,7 @@ public class Abcd {
       style(7,"E4",workbook,spreadsheet);  
       style(7,"E5",workbook,spreadsheet);  
       style(7,"E6",workbook,spreadsheet);  
-      style(7,"E7",workbook,spreadsheet);  
-      style(10,"E8",workbook,spreadsheet); 
+      style(7,"E7",workbook,spreadsheet);
       style(5,"E2",workbook,spreadsheet);  
       spreadsheet.setColumnWidth(0,5000);  
       spreadsheet.setColumnWidth(1,4000);  
@@ -306,8 +299,8 @@ public class Abcd {
          Object [] objectArr_hebdo = empinfo.get(empinfo.size()-2).get(key);
          Object [] objectArr_mensuel = empinfo.get(empinfo.size()-1).get(key);
          int cellid = 0;
-         int cellid_h = 6;
-         int cellid_m = 12;
+         int cellid_h = 7;
+         int cellid_m = 14;
          int k=0;
          
          String aa = null;
@@ -344,12 +337,12 @@ public class Abcd {
             /////////////////////// 
             ///////////////////////
             Cell cell1 = row.createCell(cellid_h++);
-            if(cell1.getColumnIndex() == 8){
+            if(cell1.getColumnIndex() == 9){
               cell1.setCellValue(objectArr_hebdo[k].toString());
             }
-            else if((cell1.getColumnIndex() == 7 || cell1.getColumnIndex() == 9) && cell1.getRowIndex()>1){
+            else if((cell1.getColumnIndex() == 8 || cell1.getColumnIndex() == 10) && cell1.getRowIndex()>1){
                 double a = Double.parseDouble(objectArr_hebdo[k].toString());
-                if(cell1.getColumnIndex() == 7 && cell1.getRowIndex()>1){ 
+                if(cell1.getColumnIndex() == 8 && cell1.getRowIndex()>1){
                     //hps1.add(a);
                     bb1 = Math.round((float)a);
                 }
@@ -357,7 +350,7 @@ public class Abcd {
             }
             else{
                 String x = objectArr_hebdo[k].toString();
-                if(cell1.getColumnIndex() == 6 && cell1.getRowIndex()>1  && cell1.getRowIndex()< 2+NB_USINE){ //////----------------//////////////// CECI FIXE LE NOMBRE D'USINE(PAS BON)
+                if(cell1.getColumnIndex() == 7 && cell1.getRowIndex()>1  && cell1.getRowIndex()< 2+NB_USINE){ //////----------------//////////////// CECI FIXE LE NOMBRE D'USINE(PAS BON)
                     //factories1.add(x);
                     aa1 = x;
                 }
@@ -370,12 +363,12 @@ public class Abcd {
             //////////////////////////
             ////////////////////////
             Cell cell2 = row.createCell(cellid_m++);
-            if(cell2.getColumnIndex() == 14){
+            if(cell2.getColumnIndex() == 16){
               cell2.setCellValue(objectArr_mensuel[k].toString());
             }
-            else if((cell2.getColumnIndex() == 13 || cell2.getColumnIndex() == 15) && cell2.getRowIndex()>1){
+            else if((cell2.getColumnIndex() == 15 || cell2.getColumnIndex() == 17) && cell2.getRowIndex()>1){
                 double a = Double.parseDouble(objectArr_mensuel[k].toString());
-                if(cell2.getColumnIndex() == 13 && cell2.getRowIndex()>1){ 
+                if(cell2.getColumnIndex() == 15 && cell2.getRowIndex()>1){
                     //hps2.add(a);
                     bb2 = Math.round((float)a);
                 }
@@ -383,7 +376,7 @@ public class Abcd {
             }
             else{
                 String x = objectArr_mensuel[k].toString();
-                if(cell2.getColumnIndex() == 12 && cell2.getRowIndex()>1  && cell2.getRowIndex()< 2+NB_USINE){ //////----------------//////////////// CECI FIXE LE NOMBRE D'USINE(PAS BON)
+                if(cell2.getColumnIndex() == 14 && cell2.getRowIndex()>1  && cell2.getRowIndex()< 2+NB_USINE){ //////----------------//////////////// CECI FIXE LE NOMBRE D'USINE(PAS BON)
                     //factories2.add(x);
                     aa2 = x;
                 }
@@ -397,114 +390,128 @@ public class Abcd {
       }
       
       spreadsheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 4));
-      spreadsheet.addMergedRegion(new CellRangeAddress(0, 0, 7, 10));
-      spreadsheet.addMergedRegion(new CellRangeAddress(0, 0, 13, 16)); 
+      spreadsheet.addMergedRegion(new CellRangeAddress(0, 0, 8, 11));
+      spreadsheet.addMergedRegion(new CellRangeAddress(0, 0, 15, 18));
        
 
       CellReference cr_Y;
       Cell cell2;  
       colorHeader("B1", HSSFColor.GREEN.index, workbook, spreadsheet);
-      colorHeader("H1", HSSFColor.GREEN.index, workbook, spreadsheet);
-      colorHeader("N1", HSSFColor.GREEN.index, workbook, spreadsheet);
+      colorHeader("I1", HSSFColor.GREEN.index, workbook, spreadsheet);
+      colorHeader("P1", HSSFColor.GREEN.index, workbook, spreadsheet);
      
       for(int j=3;j<=8;j++){
           style(11,"B"+j,workbook,spreadsheet);
-          style(11,"H"+j,workbook,spreadsheet);
-          style(11,"N"+j,workbook,spreadsheet);
+          style(11,"I"+j,workbook,spreadsheet);
+          style(11,"P"+j,workbook,spreadsheet);
       }
       for(int j=3;j<=8;j++){
           style(11,"C"+j,workbook,spreadsheet); 
-          style(11,"I"+j,workbook,spreadsheet); 
-          style(11,"P"+j,workbook,spreadsheet); 
+          style(11,"J"+j,workbook,spreadsheet);
+          style(11,"R"+j,workbook,spreadsheet);
       }
       for(int j=3;j<=8;j++){
           style(11,"D"+j,workbook,spreadsheet);
-          style(11,"J"+j,workbook,spreadsheet); 
-          style(11,"O"+j,workbook,spreadsheet); 
+          style(11,"K"+j,workbook,spreadsheet);
+          style(11,"Q"+j,workbook,spreadsheet);
       }
       for(int j=3;j<=8;j++){
-          style(12,"E"+j,workbook,spreadsheet);
-          style(11,"K"+j,workbook,spreadsheet); 
-          style(11,"Q"+j,workbook,spreadsheet); 
+          style(11,"E"+j,workbook,spreadsheet);
+
+          style(12,"F"+j,workbook,spreadsheet); //*_*
+
+          style(11,"L"+j,workbook,spreadsheet);
+
+          style(12,"M"+j,workbook,spreadsheet); //*_*
+
+          style(11,"S"+j,workbook,spreadsheet);
+
+          style(12,"T"+j,workbook,spreadsheet); //*_*
       }
       
       style(3,"B2",workbook,spreadsheet);
-      style(3,"H2",workbook,spreadsheet);
-      style(3,"N2",workbook,spreadsheet);
+      style(3,"I2",workbook,spreadsheet);
+      style(3,"P2",workbook,spreadsheet);
       
       style(4,"C2",workbook,spreadsheet);
-      style(4,"I2",workbook,spreadsheet);
-      style(4,"P2",workbook,spreadsheet);
+      style(4,"J2",workbook,spreadsheet);
+      style(4,"R2",workbook,spreadsheet);
       
       style(4,"D2",workbook,spreadsheet);
-      style(4,"J2",workbook,spreadsheet);
-      style(4,"O2",workbook,spreadsheet);
+              style(4,"E2",workbook,spreadsheet);
+      style(4,"K2",workbook,spreadsheet);
+              style(4,"L2",workbook,spreadsheet);
+      style(4,"Q2",workbook,spreadsheet);
+              style(4,"S2",workbook,spreadsheet);
       
       style(6,"A3",workbook,spreadsheet);
-      style(6,"G3",workbook,spreadsheet);
-      style(6,"M3",workbook,spreadsheet);
+      style(6,"H3",workbook,spreadsheet);
+      style(6,"O3",workbook,spreadsheet);
       
       style(7,"A4",workbook,spreadsheet);
-      style(7,"G4",workbook,spreadsheet);
-      style(7,"M4",workbook,spreadsheet);
+      style(7,"H4",workbook,spreadsheet);
+      style(7,"O4",workbook,spreadsheet);
       
       style(7,"A5",workbook,spreadsheet);
-      style(7,"G5",workbook,spreadsheet);
-      style(7,"M5",workbook,spreadsheet);
+      style(7,"H5",workbook,spreadsheet);
+      style(7,"O5",workbook,spreadsheet);
       
       style(7,"A6",workbook,spreadsheet);
-      style(7,"G6",workbook,spreadsheet);
-      style(7,"M6",workbook,spreadsheet);
+      style(7,"H6",workbook,spreadsheet);
+      style(7,"O6",workbook,spreadsheet);
       
       style(7,"A7",workbook,spreadsheet);
-      style(7,"G7",workbook,spreadsheet);
-      style(7,"M7",workbook,spreadsheet);
+      style(7,"H7",workbook,spreadsheet);
+      style(7,"O7",workbook,spreadsheet);
       
       style(10,"A8",workbook,spreadsheet);
-      style(10,"G8",workbook,spreadsheet);
-      style(10,"M8",workbook,spreadsheet);
+      style(10,"H8",workbook,spreadsheet);
+      style(10,"O8",workbook,spreadsheet);
       
       style(8,"B8",workbook,spreadsheet);
-      style(8,"H8",workbook,spreadsheet);
-      style(8,"N8",workbook,spreadsheet);
-      
-      style(8,"C8",workbook,spreadsheet);
       style(8,"I8",workbook,spreadsheet);
       style(8,"P8",workbook,spreadsheet);
       
-      style(8,"D8",workbook,spreadsheet);
+      style(8,"C8",workbook,spreadsheet);
       style(8,"J8",workbook,spreadsheet);
-      style(8,"O8",workbook,spreadsheet);
+      style(8,"R8",workbook,spreadsheet);
       
-      style(7,"E3",workbook,spreadsheet);
-      style(7,"K3",workbook,spreadsheet);
-      style(7,"Q3",workbook,spreadsheet);
+      style(8,"D8",workbook,spreadsheet);
+      style(8,"K8",workbook,spreadsheet);
+      style(8,"Q8",workbook,spreadsheet);
       
-      style(7,"E4",workbook,spreadsheet);
-      style(7,"K4",workbook,spreadsheet);
-      style(7,"Q4",workbook,spreadsheet);
+      style(7,"F3",workbook,spreadsheet);
+      style(7,"M3",workbook,spreadsheet);
+      style(7,"T3",workbook,spreadsheet);
       
-      style(7,"E5",workbook,spreadsheet);
-      style(7,"K5",workbook,spreadsheet);
-      style(7,"Q5",workbook,spreadsheet);
+      style(7,"F4",workbook,spreadsheet);
+      style(7,"M4",workbook,spreadsheet);
+      style(7,"T4",workbook,spreadsheet);
       
-      style(7,"E6",workbook,spreadsheet);
-      style(7,"K6",workbook,spreadsheet);
-      style(7,"Q6",workbook,spreadsheet);
+      style(7,"F5",workbook,spreadsheet);
+      style(7,"M5",workbook,spreadsheet);
+      style(7,"T5",workbook,spreadsheet);
       
-      style(7,"E7",workbook,spreadsheet);
-      style(7,"K7",workbook,spreadsheet);
-      style(7,"Q7",workbook,spreadsheet);
+      style(7,"F6",workbook,spreadsheet);
+      style(7,"M6",workbook,spreadsheet);
+      style(7,"T6",workbook,spreadsheet);
       
-      style(10,"E8",workbook,spreadsheet);
-      style(10,"K8",workbook,spreadsheet);
-      style(10,"Q8",workbook,spreadsheet);
+      style(7,"F7",workbook,spreadsheet);
+      style(7,"M7",workbook,spreadsheet);
+      style(7,"T7",workbook,spreadsheet);
+      
+      style(10,"F8",workbook,spreadsheet);
+      style(10,"M8",workbook,spreadsheet);
+      style(10,"T8",workbook,spreadsheet);
         
-      style(5,"E2",workbook,spreadsheet);
-      style(5,"K2",workbook,spreadsheet);
-      style(5,"Q2",workbook,spreadsheet);
-      
-      spreadsheet.setColumnWidth(0,5000);
+      style(5,"F2",workbook,spreadsheet);
+      style(5,"M2",workbook,spreadsheet);
+      style(5,"T2",workbook,spreadsheet);
+
+              style(8,"E8",workbook,spreadsheet);
+              style(8,"S8",workbook,spreadsheet);
+              style(8,"L8",workbook,spreadsheet);
+      spreadsheet.setColumnWidth(0, 5000);
       spreadsheet.setColumnWidth(6,5000);
       spreadsheet.setColumnWidth(12,5000);
       
@@ -515,22 +522,32 @@ public class Abcd {
       spreadsheet.setColumnWidth(2,4000);
       spreadsheet.setColumnWidth(8,4000);
       spreadsheet.setColumnWidth(14,4000);
+
+              ///////////////////
+      spreadsheet.setColumnWidth(10,4000);
       
       spreadsheet.setColumnWidth(3,4000);
       spreadsheet.setColumnWidth(9,4000);
       spreadsheet.setColumnWidth(15,4000);
       
       spreadsheet.setColumnWidth(4,8000);
-      spreadsheet.setColumnWidth(10,8000);
-      spreadsheet.setColumnWidth(16,8000);
+      spreadsheet.setColumnWidth(11,8000);
+      spreadsheet.setColumnWidth(18,8000);
+
+      spreadsheet.setColumnWidth(5,8000);
+      spreadsheet.setColumnWidth(12,8000);
+      spreadsheet.setColumnWidth(19,8000);
+
+              spreadsheet.setColumnWidth(16,4000);
+              spreadsheet.setColumnWidth(17,4000);
       
       cr_Y = new CellReference("A9");
       row = spreadsheet.getRow(cr_Y.getRow());
       cell2 = row.getCell(cr_Y.getCol()); 
       cell2.setCellValue("");
       drawChart(workbook, spreadsheet, 9, 0, 1, values0);
-      drawChart(workbook, spreadsheet, 9, 6, 2, values1);
-      drawChart(workbook, spreadsheet, 9, 12, 3, values2);
+      drawChart(workbook, spreadsheet, 9, 7, 2, values1);
+      drawChart(workbook, spreadsheet, 9, 14, 3, values2);
       
        ////////////////
        ////////////////
@@ -541,6 +558,12 @@ public class Abcd {
       FileOutputStream out = new FileOutputStream(new File(name)); //+".xlsx"
       workbook.write(out);
       out.close();
+        
+        FileInputStream fi = new FileInputStream(new File(name));
+        XSSFWorkbook workbk = new XSSFWorkbook(fi);
+        num_sheets = workbk.getNumberOfSheets();
+        fi.close();
+      
       System.out.println(name+".xlsx written successfully" );
     }
     
@@ -572,7 +595,7 @@ public class Abcd {
       row = spreadsheet.getRow(cr_Y.getRow());
       cell_Y = row.getCell(cr_Y.getCol());
       Long total = Math.round(cell_Y.getNumericCellValue());
-      obj_Y = new Object[]{ville, total, chaine_Y, max_YY, ""};  ///////////////++++++++++
+      obj_Y = new Object[]{ville, total, chaine_Y, max_YY, "", ""};  ///////////////++++++++++  *_*
       return obj_Y;
     }
     
@@ -635,7 +658,7 @@ public class Abcd {
       list_Y.add("BG");
       list_Y.add("PET8");
       identification.put("YAOUNDE",list_Y); 
-      obj_Y = traitement("YAOUNDE", identification, 1, fis, jour, attr);
+      obj_Y = traitement("YAOUNDE", identification, 1, fis, jour, attr); //}}
       
        
       ///////////KOUMASSI
@@ -740,24 +763,55 @@ public class Abcd {
         
       Map < String, Object[] > result = new HashMap< String, Object[] >();
       if(jour.equals("HEBDO")){
+          System.out.println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
       result.put("1", new Object[]{"", "Classement des HP Hebdo a date"});
       }else if(jour.equals("MENSUELLE")){
+          System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOOOOOOOOOOOOOOOOOOO");
       result.put("1", new Object[]{"", "Classement des HP Mensuelle a date"});
       }else{
       result.put("1", new Object[]{"", "Classement des HP du "+jr});
       }
-      result.put("2",new Object[]{"","HP JOUR","MOINS BON", "HP MOINS BON", "Cause Majeure"});
-      result.put("3",obj_Y);
-      result.put("4",obj_K);
-      result.put("5",obj_N);
-      result.put("6",obj_B);
-      result.put("7",obj_G);
-      result.put("8",obj_S);
+      result.put("2", new Object[]{"", "HP JOUR", "MOINS BON", "HP MOINS BON", "Cause Majeure", "Statut"}); //*_*
+        Vector<Object[]> trop = new  Vector<Object[]>();
+        Vector<Object[]> trop1 = new  Vector<Object[]>();
+        trop.add(obj_Y);
+        trop.add(obj_K);
+        trop.add(obj_N);
+        trop.add(obj_B);
+        trop.add(obj_G);
+        trop.add(obj_S);
+        System.out.println("LONGUEUR TROP = " + trop.size());
+        trop1 = tri(trop);
+        int p=0;
+        System.out.println("LONGUEUR TROP1 = "+trop1.size());
+        for(int l=3; l<=3+trop1.size()-1; l++){
+            result.put(Integer.toString(l),trop1.get(p));
+            p++;
+        }
       result.put("9",new Object[]{jr});
       fis.close();
       return result;
     }
-    
+
+    public Vector<Object[]> tri(Vector<Object[]> p){
+        Vector<Object[]> finale = new Vector<Object[]>();
+        HashMap<Object[],Long> sorter = new HashMap<>();
+        for(int i=0; i< p.size(); i++){
+            sorter.put(p.get(i),(Long)p.get(i)[1]);
+        }
+
+
+        Map<Object[], Long> values = sortByComparatorO(sorter, false);
+
+
+        Set<Object[]> keys = values.keySet(); //////////&&&&
+        for (Object[] key : keys) {
+            finale.add(key);
+            // do something
+        }
+        return finale;
+    }
+
     public ArrayList<Map < String, Object[] >> readALL(String name) throws IOException{
         ArrayList<Map < String, Object[] >> all = new ArrayList<Map < String, Object[] >>();
         if(testPresence(name, "LUNDI")){
@@ -903,11 +957,21 @@ public class Abcd {
                renderer.setSeriesItemLabelsVisible(0, true);
                 
                 BarChartObject.getCategoryPlot().setBackgroundPaint(Color.white);
+               //////////////// ++++
+
+               ((BarRenderer)BarChartObject.getCategoryPlot().getRenderer()).setBarPainter(new StandardBarPainter());
+
+               final CategoryPlot plot = BarChartObject.getCategoryPlot();
+               plot.setDomainGridlinePaint(Color.black);
+               plot.setRangeGridlinePaint(Color.black);
+               /////////////// ++++
                 ((BarRenderer) BarChartObject.getCategoryPlot().getRenderer()).setItemMargin(12);
-                renderer.setMaximumBarWidth(0.1);
+                renderer.setMaximumBarWidth(0.05);
                 renderer.setSeriesPaint(0, new Color(91, 155, 213)); 
                 //renderer.setMaximumBarWidth(0.1);
-                BarChartObject.getCategoryPlot().setRenderer(renderer);
+                renderer.setBarPainter(new StandardBarPainter());
+               BarChartObject.getCategoryPlot().setDomainGridlineStroke(new BasicStroke());
+               BarChartObject.getCategoryPlot().setRenderer(renderer);
                int width=660; /* Width of the chart */
                int height=400; /* Height of the chart */
                ByteArrayOutputStream chart_out = new ByteArrayOutputStream();          
@@ -960,6 +1024,41 @@ public class Abcd {
         // Maintaining insertion order with the help of LinkedList
         Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
         for (Entry<String, Integer> entry : list)
+        {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+    private static Map<Object[], Long> sortByComparatorO(Map<Object[], Long> unsortMap, final boolean order){
+
+        List<Entry<Object[], Long>> list = new LinkedList<Entry<Object[], Long>>(unsortMap.entrySet());
+        Set<Object[]> pp = unsortMap.keySet();
+        for(Object[] p : pp){
+            System.out.println("---- key is "+p+" value is "+unsortMap.get(p));
+        }
+        // Sorting the list based on values
+        Collections.sort(list, new Comparator<Entry<Object[], Long>>()
+        {
+            public int compare(Entry<Object[], Long> o1,
+                               Entry<Object[], Long> o2)
+            {
+                if (order)
+                {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+                else
+                {
+                    return o2.getValue().compareTo(o1.getValue());
+
+                }
+            }
+        });
+
+        // Maintaining insertion order with the help of LinkedList
+        Map<Object[], Long> sortedMap = new LinkedHashMap<Object[], Long>();
+        for (Entry<Object[], Long> entry : list)
         {
             sortedMap.put(entry.getKey(), entry.getValue());
         }

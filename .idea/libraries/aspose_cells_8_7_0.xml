@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="aspose-cells-8.7.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/lib/aspose-cells-8.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lib/bcprov-jdk16-146.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

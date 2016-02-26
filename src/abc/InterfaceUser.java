@@ -12,9 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -31,6 +29,8 @@ public class InterfaceUser extends javax.swing.JDialog {
         initComponents();
         this.annee = extractAnnee(LocalDateTime.now().toString());
         this.setLocationRelativeTo(null);
+        this.setModal(true);
+        this.setAlwaysOnTop(true);
     }
 
     /**
@@ -161,7 +161,7 @@ public class InterfaceUser extends javax.swing.JDialog {
                         .addGap(172, 172, 172)
                         .addComponent(jLabel2))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(243, 243, 243)
+                        .addGap(203, 203, 203)
                         .addComponent(load)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -213,7 +213,7 @@ public class InterfaceUser extends javax.swing.JDialog {
             file_source_chosen=true;
             fichier_source = fc.getSelectedFile().getPath();
             parcourir_fichier_source.setText(file.getName());
-            label_synthese.setText("Fichier choisie");
+            label_source1.setText("Fichier choisie");
         }  
     }//GEN-LAST:event_parcourir_fichier_sourceActionPerformed
 
@@ -255,143 +255,173 @@ public class InterfaceUser extends javax.swing.JDialog {
     }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-         load.setText("Execution en cours ...");
-        if(nom_fichier_destination.getText().equals("")){
-            nom_fichier_destination_chosen = false;
-        }else{
-            nom_fichier_destination_chosen = true;
-        } 
-        if(!testValidFileName(nom_fichier_destination.getText())){
-            JOptionPane.showMessageDialog(this, "Vous avez entree un nom de fichier destination invalide. Il contient un caractere invalide(/\\:*?\"<>|)", "Nom Fichier Invalide", JOptionPane.ERROR_MESSAGE);
-        }else{
-            if(!file_source_chosen){
-                if(!(new File("TRP").exists())){
-                   JOptionPane.showMessageDialog(this, "Bien vouloir mettre les TRPs source dans un dossier \"TRP\"", "Fichier TRP Source Introuvable", JOptionPane.ERROR_MESSAGE);
-                   return;
+         //load.setText("Execution en cours ...");
+        ImageIcon loading = new ImageIcon("loading30.gif");
+        //load = new JLabel("Chargement... ", loading, JLabel.CENTER);
+        load.setIcon(loading);
+
+        new SwingWorker<Void, String>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                // Worken hard or hardly worken...
+                InterfaceUser.this.jButton1.setEnabled(false);
+                load.setVisible(true);
+                if(nom_fichier_destination.getText().equals("")){
+                    nom_fichier_destination_chosen = false;
                 }else{
-                   this.semaine_courante = extractSemaine(getLatestFilefromDir("TRP").getName().toString());
-                   this.fichier_source = getLatestFilefromDir("TRP").getAbsolutePath();
+                    nom_fichier_destination_chosen = true;
                 }
-            }
-            if(!dossier_destination_chosen){
-                if(!(new File("SYNTHESE").exists())){
-                    new File("SYNTHESE").mkdir();
-                }
-            }
-            //this.annee = this.annee_courante.getText();
-            if(!dossier_destination_chosen && !nom_fichier_destination_chosen){
-            JOptionPane.showMessageDialog(this, "Vous n'avez ni renseignee le dossier destination ni le nom du fichier destination. \nDes valeurs par defaut seront utilise(meme dossier que l'executable de ce programme)", "Valeurs par defaut", JOptionPane.WARNING_MESSAGE);
-            }else if(!dossier_destination_chosen && nom_fichier_destination_chosen){
-                JOptionPane.showMessageDialog(this, "Vous n'avez pas renseignee le dossier destination. \nDes valeurs par defaut seront utilise(meme dossier que l'executable de ce programme)", "Valeurs par defaut", JOptionPane.WARNING_MESSAGE);
-            }else if(dossier_destination_chosen && !nom_fichier_destination_chosen){
-                JOptionPane.showMessageDialog(this, "Vous n'avez pas renseignee le nom du fichier destination. \nDes valeurs par defaut seront utilise", "Valeurs par defaut", JOptionPane.WARNING_MESSAGE);
-            }
-            //System.getProperty("user.home");
-            if(!dossier_destination_chosen && !nom_fichier_destination_chosen){
-                if(!file_synthese_chosen){
-                    fichier_destination = "SyntheseHP_Semaine_"+this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-");
-                    Abcd abcd = new Abcd(fichier_source, "SYNTHESE", fichier_destination+".xlsx", annee, null);
-                try {
-                    load.setText(".");
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), "SYNTHESE/"+fichier_destination +".xlsx");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File("SYNTHESE/"+fichier_destination+".xlsx"));
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-              }else{
-                    fichier_destination = "SyntheseHP_Semaine_"+this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-");
-                    Abcd abcd = new Abcd(fichier_source, "SYNTHESE", fichier_destination+".xlsx", annee, fichier_synthese);
-                try {
-                    load.setText(".");
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), "SYNTHESE/"+fichier_destination +".xlsx");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File("SYNTHESE/"+fichier_destination+".xlsx"));
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                }
-            }else if(dossier_destination_chosen && !nom_fichier_destination_chosen){
-                if(!file_synthese_chosen){
-                    fichier_destination = "SyntheseHP_Semaine_"+this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-") ;
-                  Abcd abcd = new Abcd(fichier_source, chemin_destination, fichier_destination+".xlsx", annee, null);
-                try {
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+fichier_destination +".xlsx");
-                    load.setText(".");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File(chemin_destination+"/"+fichier_destination +".xlsx"));
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }  
+                if(!testValidFileName(nom_fichier_destination.getText())){
+                    // JOptionPane.showMessageDialog(null, "Vous avez entree un nom de fichier destination invalide. Il contient un caractere invalide(/\\:*?\"<>|)", "Nom Fichier Invalide", JOptionPane.ERROR_MESSAGE);
                 }else{
-                    fichier_destination = "SyntheseHP_Semaine_"+this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-");
-                    Abcd abcd = new Abcd(fichier_source, chemin_destination, fichier_destination +".xlsx", annee, fichier_synthese);
-                try {
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+fichier_destination+".xlsx");
-                    load.setText(".");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File(chemin_destination+"/"+fichier_destination +".xlsx"));
+                    if(!file_source_chosen){
+                        if(!(new File("TRP").exists())){
+                            //   JOptionPane.showMessageDialog(this, "Bien vouloir mettre les TRPs source dans un dossier \"TRP\"", "Fichier TRP Source Introuvable", JOptionPane.ERROR_MESSAGE);
+                            return null;
+                        }else{
+                            InterfaceUser.this.semaine_courante = extractSemaine(getLatestFilefromDir("TRP").getName().toString());
+                            InterfaceUser.this.fichier_source = getLatestFilefromDir("TRP").getAbsolutePath();
+                        }
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                }
-                
-            }else if(!dossier_destination_chosen && nom_fichier_destination_chosen){
-                if(!file_synthese_chosen){
-                    Abcd abcd = new Abcd(fichier_source, "SYNTHESE", nom_fichier_destination.getText()+".xlsx", annee, null);
-                try {
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source),"SYNTHESE/"+nom_fichier_destination.getText()+".xlsx");
-                    load.setText(".");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File("SYNTHESE/"+nom_fichier_destination.getText()+".xlsx"));
+                    if(!dossier_destination_chosen){
+                        if(!(new File("SYNTHESE").exists())){
+                            new File("SYNTHESE").mkdir();
+                        }
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-              }else{
-                    Abcd abcd = new Abcd(fichier_source, "SYNTHESE", nom_fichier_destination.getText()+".xlsx", annee, fichier_synthese);
-                try {
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source),"SYNTHESE/"+nom_fichier_destination.getText()+".xlsx");
-                    load.setText(".");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File("SYNTHESE/"+nom_fichier_destination.getText()+".xlsx"));
+                    //this.annee = this.annee_courante.getText();
+                    if(!dossier_destination_chosen && !nom_fichier_destination_chosen){
+                        //JOptionPane.showMessageDialog(this, "Vous n'avez ni renseignee le dossier destination ni le nom du fichier destination. \nDes valeurs par defaut seront utilise(meme dossier que l'executable de ce programme)", "Valeurs par defaut", JOptionPane.WARNING_MESSAGE);
+                    }else if(!dossier_destination_chosen && nom_fichier_destination_chosen){
+                        //   JOptionPane.showMessageDialog(this, "Vous n'avez pas renseignee le dossier destination. \nDes valeurs par defaut seront utilise(meme dossier que l'executable de ce programme)", "Valeurs par defaut", JOptionPane.WARNING_MESSAGE);
+                    }else if(dossier_destination_chosen && !nom_fichier_destination_chosen){
+                        //    JOptionPane.showMessageDialog(this, "Vous n'avez pas renseignee le nom du fichier destination. \nDes valeurs par defaut seront utilise", "Valeurs par defaut", JOptionPane.WARNING_MESSAGE);
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                }
-                
-            }else{
-                if(!file_synthese_chosen){
-                    Abcd abcd = new Abcd(fichier_source, chemin_destination, nom_fichier_destination.getText()+".xlsx", annee, null);
-                try {
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx");
-                    load.setText(".");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File(chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx"));
+                    //System.getProperty("user.home");
+                    if(!dossier_destination_chosen && !nom_fichier_destination_chosen){
+                        if(!file_synthese_chosen){
+                            fichier_destination = "SyntheseHP_Semaine_"+InterfaceUser.this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-");
+                            Abcd abcd = new Abcd(fichier_source, "SYNTHESE", fichier_destination+".xlsx", annee, null);
+                            try {
+                                load.setText(".");
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), "SYNTHESE/" + fichier_destination + ".xlsx");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File("SYNTHESE/"+fichier_destination+".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }else{
+                            fichier_destination = "SyntheseHP_Semaine_"+InterfaceUser.this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-");
+                            Abcd abcd = new Abcd(fichier_source, "SYNTHESE", fichier_destination+".xlsx", annee, fichier_synthese);
+                            try {
+                                load.setText(".");
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), "SYNTHESE/" + fichier_destination + ".xlsx");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File("SYNTHESE/"+fichier_destination+".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }else if(dossier_destination_chosen && !nom_fichier_destination_chosen){
+                        if(!file_synthese_chosen){
+                            fichier_destination = "SyntheseHP_Semaine_"+InterfaceUser.this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-") ;
+                            Abcd abcd = new Abcd(fichier_source, chemin_destination, fichier_destination+".xlsx", annee, null);
+                            try {
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+fichier_destination +".xlsx");
+                                load.setText(".");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File(chemin_destination+"/"+fichier_destination +".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }else{
+                            fichier_destination = "SyntheseHP_Semaine_"+InterfaceUser.this.semaine_courante+"_Du_"+ LocalDateTime.now().toString().replaceAll(":", "-");
+                            Abcd abcd = new Abcd(fichier_source, chemin_destination, fichier_destination +".xlsx", annee, fichier_synthese);
+                            try {
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+fichier_destination+".xlsx");
+                                load.setText(".");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File(chemin_destination+"/"+fichier_destination +".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                    }else if(!dossier_destination_chosen && nom_fichier_destination_chosen){
+                        if(!file_synthese_chosen){
+                            Abcd abcd = new Abcd(fichier_source, "SYNTHESE", nom_fichier_destination.getText()+".xlsx", annee, null);
+                            try {
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source),"SYNTHESE/"+nom_fichier_destination.getText()+".xlsx");
+                                load.setText(".");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File("SYNTHESE/"+nom_fichier_destination.getText()+".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }else{
+                            Abcd abcd = new Abcd(fichier_source, "SYNTHESE", nom_fichier_destination.getText()+".xlsx", annee, fichier_synthese);
+                            try {
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source),"SYNTHESE/"+nom_fichier_destination.getText()+".xlsx");
+                                load.setText(".");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File("SYNTHESE/"+nom_fichier_destination.getText()+".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                    }else{
+                        if(!file_synthese_chosen){
+                            Abcd abcd = new Abcd(fichier_source, chemin_destination, nom_fichier_destination.getText()+".xlsx", annee, null);
+                            try {
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx");
+                                load.setText(".");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File(chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }else{
+                            Abcd abcd = new Abcd(fichier_source, chemin_destination, nom_fichier_destination.getText()+".xlsx", annee, fichier_synthese);
+                            try {
+                                abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx");
+                                load.setText(".");
+                                load.setVisible(false);
+                                if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
+                                    Desktop.getDesktop().open(new File(chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx"));
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                }else{
-                    Abcd abcd = new Abcd(fichier_source, chemin_destination, nom_fichier_destination.getText()+".xlsx", annee, fichier_synthese);
-                try {
-                    abcd.writeFormatALLSheet(abcd.readALL(abcd.fichier_source), chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx");
-                    load.setText(".");
-                    if(JOptionPane.showConfirmDialog(InterfaceUser.this, "Voulez vous ouvrir le fichier destination", "Ouvrir Fichier Resultat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION){
-                        Desktop.getDesktop().open(new File(chemin_destination+"/"+nom_fichier_destination.getText()+".xlsx"));
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceUser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                }
+
+                return null;
             }
-        }
-        
+
+            @Override
+            protected void done() {
+                InterfaceUser.this.jButton1.setEnabled(true);
+                load.setVisible(false);
+            }
+        }.execute();
+
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void parcourir_fichier_syntheseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parcourir_fichier_syntheseActionPerformed

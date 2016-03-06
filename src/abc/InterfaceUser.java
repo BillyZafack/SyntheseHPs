@@ -419,7 +419,7 @@ public class InterfaceUser extends javax.swing.JDialog {
                 load.setVisible(false);
             }
         }.execute();
-
+//
 
 
     }//GEN-LAST:event_jButton1ActionPerformed
